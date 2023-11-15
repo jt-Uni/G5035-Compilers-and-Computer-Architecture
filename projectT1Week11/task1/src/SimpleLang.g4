@@ -1,37 +1,22 @@
 grammar SimpleLang;
 
-prog : dec+ EOF;
+prog: dec+ EOF;
 
-dec
-    : typed_idfr LParen (vardec)? RParen body
-;
+dec: typed_idfr LParen (vardec)? RParen body;
 
-vardec
-    : (typed_idfr(Comma typed_idfr)*)
-;
+vardec: (typed_idfr(Comma typed_idfr)*);
 
-typed_idfr
-    : type Idfr
-;
+typed_idfr: type Idfr;
 
-type
-    : IntType | BoolType | UnitType
-;
+type: IntType | BoolType | UnitType;
 
-body
-    : LBrace ene (Semicolon ene)* RBrace
-;
+body: LBrace (typed_idfr Assign exp Semicolon)* ene RBrace;
 
-block
-    : LBrace ene (Semicolon ene)* RBrace
-;
+block: LBrace ene (Semicolon ene)* RBrace;
 
-ene
-    : exp (Semicolon exp)
-;
+ene: exp (Semicolon exp)*;
 
-exp
-    : Idfr Assign exp                                       #AssignExpr
+exp: Idfr Assign exp                                       #AssignExpr
     | LParen exp binop exp RParen                           #BinOpExpr
     | Idfr LParen (args (Comma args)*)? RParen              #InvokeExpr
     | block                                                 #BlockExpr
@@ -41,30 +26,24 @@ exp
     | Print exp                                             #PrintExpr
     | Space                                                 #SpaceExpr
     | Idfr                                                  #IdExpr
-    | IntLit                                                #IntExpr
+    | IntLit                                                #IntExprb
     | BoolLit                                               #BoolLitExpr
     | NewLine                                               #NewlineExpr
     | Skip                                                  #SkipExpr
+    | LParen exp RParen                                     #ParenExpr
+    | Minus exp                                             #NegateExpr
+    | exp binop exp                                         #TimeExpr
 ;
 
-args
-    : (exp (Comma exp)*)?
-;
+args: (exp (Comma exp)*)?;
 
-binop
-    : Eq              #EqBinop
-    | Less            #LessBinop
-    | LessEq          #LessEqBinop
-    | Greater         #GreaterBinop
-    | GreaterEq       #GreaterEqBinop
-    | Plus            #PlusBinop
-    | Minus           #MinusBinop
-    | Times           #TimesBinop
-    | Slash           #SlashBinop
-    | And             #AndBinop
-    | Or              #OrBinop
-    | Power           #PowerBinop
-;
+binop:
+      Power
+    | Times | Divide
+    | Plus | Minus
+    | Eq | Less | LessEq | Greater | GreaterEq
+    | And | Or
+    ;
 
 LParen : '(' ;
 Comma : ',' ;
@@ -78,7 +57,7 @@ Less : '<' ;
 LessEq : '<=' ;
 Greater : '>';
 GreaterEq : '>=';
-Slash : '/';
+Divide : '/';
 And : '&';
 Or : '|';
 Power : '^';
