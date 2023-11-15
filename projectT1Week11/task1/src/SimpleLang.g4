@@ -3,7 +3,11 @@ grammar SimpleLang;
 prog : dec+ EOF;
 
 dec
-    : typed_idfr LParen (vardec+=typed_idfr)? RParen body
+    : typed_idfr LParen (vardec)? RParen body
+;
+
+vardec
+    : (typed_idfr(Comma typed_idfr)*)
 ;
 
 typed_idfr
@@ -15,32 +19,51 @@ type
 ;
 
 body
-    : LBrace ene+=exp (Semicolon ene+=exp)* RBrace
+    : LBrace ene (Semicolon ene)* RBrace
 ;
 
 block
-    : LBrace ene+=exp (Semicolon ene+=exp)* RBrace
+    : LBrace ene (Semicolon ene)* RBrace
+;
+
+ene
+    : exp (Semicolon exp)
 ;
 
 exp
     : Idfr Assign exp                                       #AssignExpr
     | LParen exp binop exp RParen                           #BinOpExpr
-    | Idfr LParen (args+=exp (Comma args+=exp)*)? RParen    #InvokeExpr
+    | Idfr LParen (args (Comma args)*)? RParen              #InvokeExpr
     | block                                                 #BlockExpr
     | If exp Then block Else block                          #IfExpr
+    | While exp Do block                                    #WhileExpr
+    | Repeat block Until exp                                #RepeatExpr
     | Print exp                                             #PrintExpr
     | Space                                                 #SpaceExpr
     | Idfr                                                  #IdExpr
     | IntLit                                                #IntExpr
+    | BoolLit                                               #BoolLitExpr
+    | NewLine                                               #NewlineExpr
+    | Skip                                                  #SkipExpr
+;
+
+args
+    : (exp (Comma exp)*)?
 ;
 
 binop
     : Eq              #EqBinop
     | Less            #LessBinop
     | LessEq          #LessEqBinop
+    | Greater         #GreaterBinop
+    | GreaterEq       #GreaterEqBinop
     | Plus            #PlusBinop
     | Minus           #MinusBinop
     | Times           #TimesBinop
+    | Slash           #SlashBinop
+    | And             #AndBinop
+    | Or              #OrBinop
+    | Power           #PowerBinop
 ;
 
 LParen : '(' ;
@@ -53,6 +76,12 @@ RBrace : '}' ;
 Eq : '==' ;
 Less : '<' ;
 LessEq : '<=' ;
+Greater : '>';
+GreaterEq : '>=';
+Slash : '/';
+And : '&';
+Or : '|';
+Power : '^';
 
 Plus : '+' ;
 Times : '*' ;
@@ -63,9 +92,14 @@ Assign : ':=' ;
 Print : 'print' ;
 Space : 'space' ;
 NewLine : 'newline' ;
+Skip : 'skip';
 If : 'if' ;
 Then : 'then' ;
 Else : 'else' ;
+While : 'while';
+Repeat : 'repeat';
+Do : 'do';
+Until : 'until';
 
 IntType : 'int' ;
 BoolType : 'bool' ;
