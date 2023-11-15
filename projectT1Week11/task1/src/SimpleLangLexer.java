@@ -17,7 +17,7 @@ public class SimpleLangLexer extends Lexer {
 		new PredictionContextCache();
 	public static final int
 		LParen=1, Comma=2, RParen=3, LBrace=4, Semicolon=5, RBrace=6, Eq=7, Less=8, 
-		LessEq=9, Greater=10, GreaterEq=11, Slash=12, And=13, Or=14, Power=15, 
+		LessEq=9, Greater=10, GreaterEq=11, Divide=12, And=13, Or=14, Power=15, 
 		Plus=16, Times=17, Minus=18, Assign=19, Print=20, Space=21, NewLine=22, 
 		Skip=23, If=24, Then=25, Else=26, While=27, Repeat=28, Do=29, Until=30, 
 		IntType=31, BoolType=32, UnitType=33, BoolLit=34, IntLit=35, Idfr=36, 
@@ -33,7 +33,7 @@ public class SimpleLangLexer extends Lexer {
 	private static String[] makeRuleNames() {
 		return new String[] {
 			"LParen", "Comma", "RParen", "LBrace", "Semicolon", "RBrace", "Eq", "Less", 
-			"LessEq", "Greater", "GreaterEq", "Slash", "And", "Or", "Power", "Plus", 
+			"LessEq", "Greater", "GreaterEq", "Divide", "And", "Or", "Power", "Plus", 
 			"Times", "Minus", "Assign", "Print", "Space", "NewLine", "Skip", "If", 
 			"Then", "Else", "While", "Repeat", "Do", "Until", "IntType", "BoolType", 
 			"UnitType", "BoolLit", "IntLit", "Idfr", "WS"
@@ -53,7 +53,7 @@ public class SimpleLangLexer extends Lexer {
 	private static String[] makeSymbolicNames() {
 		return new String[] {
 			null, "LParen", "Comma", "RParen", "LBrace", "Semicolon", "RBrace", "Eq", 
-			"Less", "LessEq", "Greater", "GreaterEq", "Slash", "And", "Or", "Power", 
+			"Less", "LessEq", "Greater", "GreaterEq", "Divide", "And", "Or", "Power", 
 			"Plus", "Times", "Minus", "Assign", "Print", "Space", "NewLine", "Skip", 
 			"If", "Then", "Else", "While", "Repeat", "Do", "Until", "IntType", "BoolType", 
 			"UnitType", "BoolLit", "IntLit", "Idfr", "WS"
