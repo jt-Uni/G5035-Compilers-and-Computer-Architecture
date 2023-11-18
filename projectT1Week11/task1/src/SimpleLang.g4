@@ -1,90 +1,43 @@
 grammar SimpleLang;
 
-prog: dec+ EOF;
+// if there are multiple possibility, then visit it
+// otherwise check the type
 
-dec: typed_idfr LParen (vardec)? RParen body;
+prog: dec+ EOF ; // RuleIndex: 0
+dec:	Type Idfr '(' vardec ')' body ; // 1
+vardec:	(Type Idfr (',' Type Idfr)*)? ; // 2
+body:	'{' (Type Idfr ':=' expr ';')* ene '}';
+// int a = 5, we can assign val for the idfr we have declare in vardec
+block:	'{' ene '}';
+// visit ene
+ene:	expr (';' expr)*;
 
-vardec: (typed_idfr(Comma typed_idfr)*);
-
-typed_idfr: type Idfr;
-
-type: IntType | BoolType | UnitType;
-
-body: LBrace (typed_idfr Assign exp Semicolon)* ene RBrace;
-
-block: LBrace ene (Semicolon ene)* RBrace;
-
-ene: exp (Semicolon exp)*;
-
-exp: Idfr Assign exp                                       #AssignExpr
-    | LParen exp binop exp RParen                           #BinOpExpr
-    | Idfr LParen (args (Comma args)*)? RParen              #InvokeExpr
-    | block                                                 #BlockExpr
-    | If exp Then block Else block                          #IfExpr
-    | While exp Do block                                    #WhileExpr
-    | Repeat block Until exp                                #RepeatExpr
-    | Print exp                                             #PrintExpr
-    | Space                                                 #SpaceExpr
-    | Idfr                                                  #IdExpr
-    | IntLit                                                #IntExprb
-    | BoolLit                                               #BoolLitExpr
-    | NewLine                                               #NewlineExpr
-    | Skip                                                  #SkipExpr
-    | LParen exp RParen                                     #ParenExpr
-    | Minus exp                                             #NegateExpr
-    | exp binop exp                                         #TimeExpr
+expr
+:   BoolLit                             # BoolExpr
+|	Idfr                                # IdExpr
+|	IntLit                              # IntExpr
+|	Idfr ':=' expr                      # AssignExpr
+//  idfr := IDFR / idfr := BOOL / idfr := INT
+|	'(' expr op=BinOP expr ')'             # BinOpExpr
+// prev: BinOP == TYPE.BINOP // idfr == IDFR / idfr := BOOL / idfr := INT
+|	Idfr '(' args ')'                   # CallFunExpr
+|	block                               # BlockExpr
+|	'if' expr 'then' block 'else' block # IfExpr
+//  if  TYPE  then visit(
+|	'while' expr 'do' block             # WhileExpr
+|	'repeat' block 'until' expr         # ForExpr
+|	'print' expr                        # PrintExpr
+//   visit(ctx.expr())
+|	'space'                             # SpaceExpr
+|	'newline'                           # NewlineExpr
+|	'skip'                              # SkipExpr
 ;
 
-args: (exp (Comma exp)*)?;
-
-binop:
-      Power
-    | Times | Divide
-    | Plus | Minus
-    | Eq | Less | LessEq | Greater | GreaterEq
-    | And | Or
-    ;
-
-LParen : '(' ;
-Comma : ',' ;
-RParen : ')' ;
-LBrace : '{' ;
-Semicolon : ';' ;
-RBrace : '}' ;
-
-Eq : '==' ;
-Less : '<' ;
-LessEq : '<=' ;
-Greater : '>';
-GreaterEq : '>=';
-Divide : '/';
-And : '&';
-Or : '|';
-Power : '^';
-
-Plus : '+' ;
-Times : '*' ;
-Minus : '-' ;
-
-Assign : ':=' ;
-
-Print : 'print' ;
-Space : 'space' ;
-NewLine : 'newline' ;
-Skip : 'skip';
-If : 'if' ;
-Then : 'then' ;
-Else : 'else' ;
-While : 'while';
-Repeat : 'repeat';
-Do : 'do';
-Until : 'until';
-
-IntType : 'int' ;
-BoolType : 'bool' ;
-UnitType : 'unit' ;
-
-BoolLit : 'true' | 'false' ;
-IntLit : '0' | ('-'? [1-9][0-9]*) ;
-Idfr : [a-z][A-Za-z0-9_]* ;
-WS : [ \n\r\t]+ -> skip ;
+args:	(expr (',' expr)*)?;
+BinOP:	'=='  | '<' | '>' | '<='  | '>='
+|	 '+' | '-' | '*' | '/' | '&' | '|' | '^';
+Type:	'int' | 'bool' | 'unit';
+BoolLit:	'true' | 'false';
+Idfr:	[a-z][a-zA-Z0-9_]*;
+IntLit:	'0' | ('-'? [1-9][0-9]*);
+WS     : [ \n\r\t]+ -> skip ;
